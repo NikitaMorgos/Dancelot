@@ -222,6 +222,27 @@ bot.action(/^recap:(\d+)$/, async (ctx) => {
   await ctx.answerCbQuery();
 });
 
+const launchBot = async (retries = 3): Promise<void> => {
+  for (let i = 0; i < retries; i++) {
+    try {
+      await bot.launch();
+      console.log("Бот запущен (база знаний: мастер-классы).");
+      return;
+    } catch (e: unknown) {
+      const msg = String((e as { response?: { description?: string }; message?: string })?.response?.description ?? (e as Error).message ?? e);
+      const is409 = msg.includes("409") || msg.includes("Conflict") || msg.includes("getUpdates");
+      if (is409 && i < retries - 1) {
+        const wait = 15;
+        console.warn(`Конфликт бота (другой экземпляр?). Ждём ${wait} с и повторяем (${i + 1}/${retries})...`);
+        await new Promise((r) => setTimeout(r, wait * 1000));
+      } else {
+        console.error("Ошибка запуска бота:", e);
+        process.exit(1);
+      }
+    }
+  }
+};
+
 (async () => {
   try {
     await initDb();
@@ -232,8 +253,7 @@ bot.action(/^recap:(\d+)$/, async (ctx) => {
       { command: "login", description: "Ссылка для входа на сайт с базой рекапов" },
     ]);
     await bot.telegram.setChatMenuButton({ menuButton: { type: "commands" } });
-    await bot.launch();
-    console.log("Бот запущен (база знаний: мастер-классы).");
+    await launchBot();
   } catch (e) {
     console.error("Ошибка запуска бота:", e);
     process.exit(1);
