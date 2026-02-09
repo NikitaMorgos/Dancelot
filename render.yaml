@@ -1,0 +1,17 @@
+# Render Blueprint: один веб-сервис (бот + сайт с базой рекапов)
+# https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: dancelot
+    runtime: node
+    plan: free
+
+    buildCommand: npm install
+    startCommand: npm run start:all
+
+    envVars:
+      - key: BOT_USERNAME
+        value: Dancelot_bot
+      # TELEGRAM_BOT_TOKEN — задай вручную в Dashboard (Environment)
+      # SITE_URL не нужен: на Render подставится RENDER_EXTERNAL_URL

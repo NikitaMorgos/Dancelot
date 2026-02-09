@@ -110,16 +110,20 @@ bot.on(message("text"), async (ctx) => {
   }
 
   if (cmd === "/login" || cmd.startsWith("/login@")) {
-    if (!userId) {
-      await ctx.reply("Не удалось определить пользователя.");
-      return;
+    const siteUrl = (process.env.SITE_URL || process.env.RENDER_EXTERNAL_URL || "").trim();
+    const isPublic = siteUrl.length > 0 && !/^https?:\/\/localhost(\b|:)/i.test(siteUrl);
+    if (isPublic && userId) {
+      const token = createLoginToken(userId, 15);
+      const link = `${siteUrl.replace(/\/$/, "")}/auth/verify?t=${token}`;
+      await ctx.reply(
+        `Вход на сайт с базой рекапов (ссылка действует 15 минут):\n\n${link}\n\nОткрой ссылку в браузере — попадёшь в базу рекапов.`
+      );
+    } else {
+      const projectUrl = "https://nikitamorgos.github.io/Dancelot/";
+      await ctx.reply(
+        `Сайт проекта Dancelot:\n\n${projectUrl}\n\nБаза рекапов с входом по ссылке доступна, когда сервер запущен (локально или на хостинге). Чтобы бот отправлял ссылку для входа в базу, укажи в .env переменную SITE_URL с адресом развёрнутого сайта.`
+      );
     }
-    const siteUrl = process.env.SITE_URL || "http://localhost:3000";
-    const token = createLoginToken(userId, 15);
-    const link = `${siteUrl}/auth/verify?t=${token}`;
-    await ctx.reply(
-      `Вход на сайт (ссылка действует 15 минут):\n\n${link}\n\nОткрой ссылку в браузере — попадёшь в базу рекапов.`
-    );
     return;
   }
 
@@ -224,7 +228,7 @@ bot.action(/^recap:(\d+)$/, async (ctx) => {
     { command: "start", description: "Начать / приветствие" },
     { command: "help", description: "Подсказка по формату рекапов" },
     { command: "list", description: "Открыть базу рекапов" },
-    { command: "login", description: "Ссылка для входа на сайт" },
+    { command: "login", description: "Ссылка для входа на сайт с базой рекапов" },
   ]);
   await bot.telegram.setChatMenuButton({ menuButton: { type: "commands" } });
   await bot.launch();
