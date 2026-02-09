@@ -102,7 +102,7 @@ app.post("/api/auth/telegram", (req, res) => {
 
 // GET /auth/verify?t=TOKEN — вход по ссылке из бота (команда /login)
 app.get("/auth/verify", (req, res) => {
-  const token = req.query.t as string;
+  const token = (req.query.t as string)?.trim();
   if (!token) {
     return res.redirect("/?error=no_token");
   }
