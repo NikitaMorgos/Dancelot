@@ -223,16 +223,21 @@ bot.action(/^recap:(\d+)$/, async (ctx) => {
 });
 
 (async () => {
-  await initDb();
-  await bot.telegram.setMyCommands([
-    { command: "start", description: "Начать / приветствие" },
-    { command: "help", description: "Подсказка по формату рекапов" },
-    { command: "list", description: "Открыть базу рекапов" },
-    { command: "login", description: "Ссылка для входа на сайт с базой рекапов" },
-  ]);
-  await bot.telegram.setChatMenuButton({ menuButton: { type: "commands" } });
-  await bot.launch();
-  console.log("Бот запущен (база знаний: мастер-классы).");
+  try {
+    await initDb();
+    await bot.telegram.setMyCommands([
+      { command: "start", description: "Начать / приветствие" },
+      { command: "help", description: "Подсказка по формату рекапов" },
+      { command: "list", description: "Открыть базу рекапов" },
+      { command: "login", description: "Ссылка для входа на сайт с базой рекапов" },
+    ]);
+    await bot.telegram.setChatMenuButton({ menuButton: { type: "commands" } });
+    await bot.launch();
+    console.log("Бот запущен (база знаний: мастер-классы).");
+  } catch (e) {
+    console.error("Ошибка запуска бота:", e);
+    process.exit(1);
+  }
 })();
 
 process.once("SIGINT", () => bot.stop("SIGINT"));

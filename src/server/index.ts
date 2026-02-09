@@ -183,8 +183,13 @@ app.get("/api/recaps/:id/video", async (req, res) => {
 const PORT = Number(process.env.PORT) || 3000;
 
 (async () => {
-  await initDb();
-  app.listen(PORT, () => {
-    console.log(`Сайт: http://localhost:${PORT}`);
-  });
+  try {
+    await initDb();
+    app.listen(PORT, () => {
+      console.log(`Сайт: http://localhost:${PORT}`);
+    });
+  } catch (e) {
+    console.error("Ошибка запуска сервера:", e);
+    process.exit(1);
+  }
 })();
