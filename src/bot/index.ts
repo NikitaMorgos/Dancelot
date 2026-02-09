@@ -113,10 +113,10 @@ bot.on(message("text"), async (ctx) => {
     const siteUrl = (process.env.SITE_URL || process.env.RENDER_EXTERNAL_URL || "").trim();
     const isPublic = siteUrl.length > 0 && !/^https?:\/\/localhost(\b|:)/i.test(siteUrl);
     if (isPublic && userId) {
-      const token = createLoginToken(userId, 15);
+      const token = createLoginToken(userId, 30);
       const link = `${siteUrl.replace(/\/$/, "")}/auth/verify?t=${token}`;
       await ctx.reply(
-        `Вход на сайт с базой рекапов (ссылка действует 15 минут):\n\n${link}\n\nОткрой ссылку в браузере — попадёшь в базу рекапов.`
+        `Вход на сайт с базой рекапов (ссылка 30 мин):\n\n${link}\n\nОткрой ссылку в браузере сразу — на бесплатном хостинге сервер может «засыпать», и старая ссылка перестанет работать.`
       );
     } else {
       const projectUrl = "https://nikitamorgos.github.io/Dancelot/";

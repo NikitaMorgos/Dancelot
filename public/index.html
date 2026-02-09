@@ -58,7 +58,7 @@
       errEl.textContent = 'Ошибка входа по виджету. Используйте вход по ссылке выше.';
       errEl.hidden = false;
     } else if (params.get('error') === 'expired') {
-      errEl.textContent = 'Ссылка истекла. Отправьте /login в боте ещё раз.';
+      errEl.textContent = 'Ссылка истекла или сервер перезапустился. Отправьте /login в боте заново и откройте новую ссылку сразу.';
       errEl.hidden = false;
     } else if (params.get('error') === 'no_token') {
       errEl.textContent = 'Нет токена. Используйте команду /login в боте.';
