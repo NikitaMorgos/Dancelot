@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>База рекапов — Dancelot</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: 0;
+      background: #0d1117;
+      color: #e6edf3;
+      min-height: 100vh;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      background: #161b22;
+      border-bottom: 1px solid #30363d;
+    }
+    header h1 { font-size: 1.25rem; margin: 0; }
+    header a { color: #58a6ff; text-decoration: none; }
+    .container { max-width: 800px; margin: 0 auto; padding: 1.5rem; }
+    .filters {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .filters button {
+      padding: 0.5rem 1rem;
+      border: 1px solid #30363d;
+      background: #21262d;
+      color: #e6edf3;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .filters button:hover, .filters button.active { background: #30363d; }
+    .list { display: flex; flex-direction: column; gap: 0.75rem; }
+    .card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 1rem;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .card:hover { border-color: #58a6ff; }
+    .card h3 { margin: 0 0 0.25rem; font-size: 1rem; }
+    .card .meta { color: #8b949e; font-size: 0.875rem; }
+    .card .notes { margin-top: 0.5rem; font-size: 0.875rem; color: #8b949e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+    .empty { color: #8b949e; text-align: center; padding: 2rem; }
+    #detail { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10; align-items: center; justify-content: center; padding: 1rem; overflow: auto; }
+    #detail.show { display: flex; }
+    #detail .panel {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 1.5rem;
+      max-width: 560px;
+      width: 100%;
+      max-height: 90vh;
+      overflow: auto;
+    }
+    #detail h2 { margin: 0 0 1rem; font-size: 1.25rem; }
+    #detail .meta { color: #8b949e; margin-bottom: 1rem; }
+    #detail .notes { white-space: pre-wrap; line-height: 1.5; }
+    #detail video { width: 100%; border-radius: 8px; margin-bottom: 1rem; }
+    #detail .close { margin-top: 1rem; padding: 0.5rem 1rem; background: #21262d; border: 1px solid #30363d; color: #e6edf3; border-radius: 6px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📂 База рекапов</h1>
+    <a href="/" id="logout">Выйти</a>
+  </header>
+  <main class="container">
+    <div class="filters" id="filters"></div>
+    <div class="list" id="list"></div>
+    <p class="empty" id="empty" hidden>Нет рекапов. Добавляйте видео с подписью в боте.</p>
+  </main>
+  <div id="detail">
+    <div class="panel">
+      <h2 id="detail-title"></h2>
+      <div class="meta" id="detail-meta"></div>
+      <video id="detail-video" controls playsinline></video>
+      <div class="notes" id="detail-notes"></div>
+      <button class="close" id="detail-close">Закрыть</button>
+    </div>
+  </div>
+  <script>
+    const listEl = document.getElementById('list');
+    const emptyEl = document.getElementById('empty');
+    const filtersEl = document.getElementById('filters');
+    const detailEl = document.getElementById('detail');
+    const detailTitle = document.getElementById('detail-title');
+    const detailMeta = document.getElementById('detail-meta');
+    const detailVideo = document.getElementById('detail-video');
+    const detailNotes = document.getElementById('detail-notes');
+    const detailClose = document.getElementById('detail-close');
+
+    async function api(path, opts = {}) {
+      const r = await fetch(path, { credentials: 'include', ...opts });
+      if (r.status === 401) { location.href = '/'; return null; }
+      return r;
+    }
+
+    async function loadRecaps(style) {
+      const url = style ? `/api/recaps?style=${encodeURIComponent(style)}` : '/api/recaps';
+      const r = await api(url);
+      if (!r) return;
+      const { recaps } = await r.json();
+      listEl.innerHTML = '';
+      if (!recaps.length) { emptyEl.hidden = false; return; }
+      emptyEl.hidden = true;
+      recaps.forEach(r => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `<h3>${escapeHtml(r.title || 'Рекап #' + r.id)}</h3><div class="meta">${r.style}${r.level ? ' · ' + r.level : ''}${r.skill_type ? ' · ' + r.skill_type : ''}</div><div class="notes">${escapeHtml(r.notes.slice(0, 120))}${r.notes.length > 120 ? '…' : ''}</div>`;
+        card.onclick = () => openDetail(r.id);
+        listEl.appendChild(card);
+      });
+    }
+
+    function escapeHtml(s) {
+      const div = document.createElement('div');
+      div.textContent = s;
+      return div.innerHTML;
+    }
+
+    async function openDetail(id) {
+      const r = await api(`/api/recaps/${id}`);
+      if (!r) return;
+      const recap = await r.json();
+      detailTitle.textContent = recap.title || 'Рекап #' + recap.id;
+      detailMeta.textContent = [recap.style, recap.level, recap.skill_type].filter(Boolean).join(' · ');
+      detailNotes.textContent = recap.notes;
+      if (recap.video_file_id) {
+        detailVideo.style.display = 'block';
+        detailVideo.src = `/api/recaps/${id}/video`;
+      } else {
+        detailVideo.style.display = 'none';
+        detailVideo.removeAttribute('src');
+      }
+      detailEl.classList.add('show');
+    }
+
+    detailClose.onclick = () => detailEl.classList.remove('show');
+    detailEl.onclick = (e) => { if (e.target === detailEl) detailEl.classList.remove('show'); };
+
+    document.getElementById('logout').onclick = async (e) => {
+      e.preventDefault();
+      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+      location.href = '/';
+    };
+
+    (async () => {
+      const me = await api('/api/me');
+      if (!me) return;
+      const styles = ['WCS', 'хастл', 'бачата', 'зук', 'СБТ', 'другое'];
+      filtersEl.innerHTML = '<button class="active" data-style="">Все</button>' + styles.map(s => `<button data-style="${escapeHtml(s)}">${escapeHtml(s)}</button>`).join('');
+      filtersEl.querySelectorAll('button').forEach(btn => {
+        btn.onclick = () => {
+          filtersEl.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          loadRecaps(btn.dataset.style || undefined);
+        };
+      });
+      await loadRecaps();
+    })();
+  </script>
+</body>
+</html>

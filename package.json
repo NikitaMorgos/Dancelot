@@ -1,0 +1,31 @@
+{
+  "name": "dancelot",
+  "version": "0.1.0",
+  "description": "AI-поддержка танцора: база знаний, турниры, тренировки",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx watch src/index.ts",
+    "bot": "tsx src/bot/index.ts",
+    "server": "tsx src/server/index.ts",
+    "db:init": "tsx src/db/init.ts"
+  },
+  "keywords": ["dance", "wcs", "hustle", "knowledge-base"],
+  "license": "MIT",
+  "dependencies": {
+    "telegraf": "^4.16.3",
+    "sql.js": "^1.11.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "cookie-parser": "^1.4.6"
+  },
+  "devDependencies": {
+    "@types/cookie-parser": "^1.4.7",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

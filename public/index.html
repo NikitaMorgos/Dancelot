@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dancelot — вход</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(160deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      color: #e8e8e8;
+      padding: 1rem;
+    }
+    h1 { font-size: 1.75rem; margin-bottom: 0.5rem; }
+    p { color: #a0a0a0; margin-bottom: 1rem; text-align: center; max-width: 320px; }
+    .login-link {
+      background: #2563eb;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      margin: 1rem 0;
+      display: inline-block;
+    }
+    .login-link:hover { background: #1d4ed8; }
+    .steps { text-align: left; background: rgba(255,255,255,0.06); padding: 1rem 1.25rem; border-radius: 8px; margin-top: 1rem; max-width: 320px; }
+    .steps ol { margin: 0; padding-left: 1.25rem; color: #a0a0a0; line-height: 1.7; }
+    .error { color: #ff6b6b; margin-top: 1rem; }
+    #telegram-widget { margin-top: 1.5rem; }
+  </style>
+</head>
+<body>
+  <h1>Dancelot</h1>
+  <p>База знаний по мастер-классам</p>
+
+  <p><strong>Войти по ссылке</strong> (работает на localhost и без настройки домена):</p>
+  <div class="steps">
+    <ol>
+      <li>Открой бота <strong>@Dancelot_bot</strong> в Telegram.</li>
+      <li>Отправь команду <strong>/login</strong>.</li>
+      <li>Скопируй ссылку из ответа бота и открой её в этом браузере.</li>
+    </ol>
+  </div>
+
+  <p class="error" id="err" hidden></p>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const errEl = document.getElementById('err');
+    if (params.get('error') === 'invalid') {
+      errEl.textContent = 'Ошибка входа по виджету. Используйте вход по ссылке выше.';
+      errEl.hidden = false;
+    } else if (params.get('error') === 'expired') {
+      errEl.textContent = 'Ссылка истекла. Отправьте /login в боте ещё раз.';
+      errEl.hidden = false;
+    } else if (params.get('error') === 'no_token') {
+      errEl.textContent = 'Нет токена. Используйте команду /login в боте.';
+      errEl.hidden = false;
+    }
+  </script>
+
+  <div id="telegram-widget">
+    <p style="font-size: 0.875rem;">Либо войти через кнопку Telegram (нужен домен в BotFather):</p>
+    <div id="telegram-login"></div>
+  </div>
+  <script>
+    (async () => {
+      const cfg = await fetch('/api/config').then(r => r.json()).catch(() => ({ botUsername: 'Dancelot_bot' }));
+      const authUrl = location.origin + '/api/auth/telegram-callback';
+      const script = document.createElement('script');
+      script.async = true;
+      script.src = 'https://telegram.org/js/telegram-widget.js?22';
+      script.setAttribute('data-telegram-login', cfg.botUsername);
+      script.setAttribute('data-size', 'large');
+      script.setAttribute('data-auth-url', authUrl);
+      script.setAttribute('data-request-access', 'write');
+      document.getElementById('telegram-login').appendChild(script);
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+# База данных (локальные данные)
+data/
+
+# Секреты
+.env
+
+# Сборка и зависимости
+node_modules/
+dist/
+
+# Логи и ОС
+*.log
+bot-log.txt
+token-check-log.txt
+publish-log.txt
+.DS_Store
+Thumbs.db
