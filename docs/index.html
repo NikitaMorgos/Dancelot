@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dancelot — база знаний для танцоров</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(160deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      color: #e8e8e8;
+      padding: 1.5rem;
+    }
+    h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+    p { color: #a0a0a0; margin-bottom: 1rem; text-align: center; max-width: 360px; }
+    .card {
+      background: rgba(255,255,255,0.06);
+      padding: 1.25rem 1.5rem;
+      border-radius: 12px;
+      margin: 1rem 0;
+      max-width: 360px;
+      text-align: left;
+    }
+    .card ol { margin: 0; padding-left: 1.25rem; color: #a0a0a0; line-height: 1.8; }
+    a {
+      color: #60a5fa;
+      text-decoration: none;
+    }
+    a:hover { text-decoration: underline; }
+    .btn {
+      display: inline-block;
+      background: #2563eb;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      margin-top: 0.5rem;
+    }
+    .btn:hover { background: #1d4ed8; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <h1>Dancelot</h1>
+  <p>База знаний по мастер-классам для танцоров</p>
+
+  <div class="card">
+    <p style="color: #e8e8e8; margin-bottom: 0.5rem;"><strong>Как пользоваться</strong></p>
+    <ol>
+      <li>Открой бота <strong>@Dancelot_bot</strong> в Telegram.</li>
+      <li>Отправляй рекапы: видео + подпись (стиль, уровень, навык, название, заметки).</li>
+      <li>Команды: <code>/list</code> — список, <code>/login</code> — ссылка для входа на сайт.</li>
+    </ol>
+    <a href="https://t.me/Dancelot_bot" class="btn">Открыть бота в Telegram</a>
+  </div>
+
+  <p style="font-size: 0.875rem;">
+    Полный веб-интерфейс (вход + дашборд) работает при запуске проекта локально<br>
+    или при развёрнутом бэкенде. <a href="https://github.com/NikitaMorgos/Dancelot">Репозиторий на GitHub</a>.
+  </p>
+</body>
+</html>

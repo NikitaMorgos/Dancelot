@@ -86,6 +86,16 @@ npm run server
 | `npm run db:init` | Создание БД (один раз) |
 | `npm run build` | Сборка TypeScript     |
 
+## GitHub Pages
+
+Чтобы сайт открывался по адресу `https://nikitamorgos.github.io/Dancelot/`:
+
+1. В репозитории на GitHub: **Settings** → **Pages**.
+2. **Source:** Deploy from a branch.
+3. **Branch:** `main` → папка **/docs** → Save.
+
+Через 1–2 минуты страница будет доступна по ссылке выше.
+
 ## Лицензия
 
 MIT
